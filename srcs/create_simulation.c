@@ -39,7 +39,9 @@ t_philo	*create_simulation(char *argv[])
 	data->time_to_sleep = ft_atoi(argv[3]);
 	data->meals_must_eat = -1;
 	data->message_lock = ft_calloc(1, sizeof(pthread_mutex_t));
+	data->end_simulation_lock = ft_calloc(1, sizeof(pthread_mutex_t));
 	pthread_mutex_init(data->message_lock, NULL);
+	pthread_mutex_init(data->end_simulation_lock, NULL);
 	if (argv[4])
 		data->meals_must_eat = ft_atoi(argv[4]);
 	while (n)

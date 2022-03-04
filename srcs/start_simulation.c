@@ -20,19 +20,25 @@ int	try_get_fork(t_philo *philo)
 	return (1);
 }
 
-void	start_eating(t_philo *philo)
+int	start_eating(t_philo *philo)
 {
-	struct	timeval start_eating;
+	long int		start_eating;
 	struct	timeval finish_eating;
 
-	gettimeofday(&start_eating, NULL);
-	gettimeofday(&finish_eating, NULL);
 	message(EATING, philo);
-	while (get_miliseconds(finish_eating) - get_miliseconds(start_eating) <= philo->data->time_to_eat)
+	set_time(&start_eating);
+	gettimeofday(&finish_eating, NULL);
+	while (get_miliseconds(finish_eating) - start_eating <= philo->data->time_to_eat)
 		gettimeofday(&finish_eating, NULL);
-	gettimeofday(&philo->last_meal, NULL);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->left->fork);
+	philo->n_meals++;
+	if (philo->n_meals == philo->data->meals_must_eat)
+		return (1);
+	message(SLEEPING, philo);
+	usleep(philo->data->time_to_sleep * 1000);
+	set_time(&philo->last_meal);
+	return (0);
 }
 
 void	check_is_dead(t_philo *philo)
@@ -40,10 +46,12 @@ void	check_is_dead(t_philo *philo)
 	struct	timeval current_time;
 
 	gettimeofday(&current_time, NULL);
-	if ((get_miliseconds(current_time) - get_miliseconds(philo->last_meal) >= philo->data->time_to_die))
+	if ((get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die))
 	{
 		message(DIED, philo);
+		pthread_mutex_lock(philo->data->end_simulation_lock);
 		philo->data->end_simulation = 1;
+		pthread_mutex_unlock(philo->data->end_simulation_lock);
 	}
 }
 
@@ -54,26 +62,25 @@ void	*lifespan(void *p)
 	int		first;
 
 	first = 1;
-	n_meals = 0;
 	philo = (t_philo *)p;
 	while (1)
 	{
 		if (!philo->data->start_simulation)
 			continue ;
 		if (first)
-			gettimeofday(&philo->last_meal, NULL);
+		{
+			if (philo->id % 2 == 0)
+				usleep(5000);
+			set_time(&philo->last_meal);
+		}
 		first = 0;
 		check_is_dead(philo);
 		if (philo->data->end_simulation)
 			break;
 		if (!try_get_fork(philo))
 			continue ;
-		start_eating(philo);
-		n_meals++;
-		if (n_meals == philo->data->meals_must_eat)
-			break;
-		message(SLEEPING, philo);
-		usleep(philo->data->time_to_sleep * 1000);
+		if (start_eating(philo))
+			break ;
 		message(THINKING, philo);
 	}
 }

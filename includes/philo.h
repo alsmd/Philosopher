@@ -22,13 +22,15 @@ typedef struct s_data
 	long int		meals_must_eat;
 	long int		start_simulation;
 	int				end_simulation;
+	pthread_mutex_t	*end_simulation_lock;
 }	t_data;
 
 typedef struct s_philo
 {
 	int				id;
 	char			*name;
-	struct	timeval	last_meal;
+	long int		last_meal;
+	int				n_meals;
 	pthread_t		thread;
 	pthread_mutex_t	*fork;
 	t_data			*data;
