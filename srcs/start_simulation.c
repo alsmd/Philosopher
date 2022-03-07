@@ -22,14 +22,14 @@ int	try_get_fork(t_philo *philo)
 
 int	start_eating(t_philo *philo)
 {
-	message(EATING, philo);
 	pthread_mutex_lock(philo->last_meal_locker);
+	message(EATING, philo);
 	usleep(philo->data->time_to_eat * 1000);
 	set_time(&philo->last_meal);
 	pthread_mutex_unlock(philo->last_meal_locker);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->fork_right);
-	philo->n_meals++;
+	philo->n_meals += 1;
 	if (philo->n_meals == philo->data->meals_must_eat)
 		return (1);
 	message(SLEEPING, philo);
@@ -43,7 +43,7 @@ void	check_is_dead(t_philo *philo)
 
 	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(philo->last_meal_locker);
-	if (philo->last_meal && (get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die))
+	if (philo->last_meal && (get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die) && philo->n_meals != philo->data->meals_must_eat)
 	{
 		pthread_mutex_unlock(philo->last_meal_locker);
 		message(DIED, philo);
@@ -80,6 +80,8 @@ void	*lifespan(void *p)
 			continue ;
 		if (start_eating(philo))
 			break ;
+		if (philo->id % 2 == 0)
+			usleep(5000);
 		message(THINKING, philo);
 	}
 }
@@ -95,7 +97,10 @@ void	*death_checker(void *p)
 	{
 		check_is_dead(philo[index]);
 		if (philo[index]->data->end_simulation)
+		{
+			printf("%d\n", philo[index]->n_meals);
 			return (NULL);
+		}
 		index++;
 		if (philo[index] == NULL)
 			index = 0;
