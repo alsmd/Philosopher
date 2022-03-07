@@ -1,6 +1,6 @@
 #include <philo.h>
 
-void	add_to_table(t_philo **list, t_data *data)
+t_philo	*create_philo(t_data *data)
 {
 	static int	id;
 	t_philo		*new_philo;
@@ -12,29 +12,34 @@ void	add_to_table(t_philo **list, t_data *data)
 	pthread_mutex_init(new_philo->fork, NULL);
 	pthread_mutex_init(new_philo->last_meal_locker, NULL);
 	new_philo->data = data;
-	new_philo->last_meal = -1;
 	id++;
 	new_philo->id = id;
-	begin = *list;
-	if (!begin)
-		*list = new_philo;
-	else
+	return (new_philo);	
+}
+
+void	link_forks(t_philo **philos)
+{
+	int	index;
+
+	index = 0;
+	while (philos[index])
 	{
-		begin->left = new_philo;
-		while (begin->right && begin->right != *list)
-			begin = begin->right;
-		begin->right = new_philo;
-		new_philo->left = begin;
-		new_philo->right = *list;
+		if (philos[index + 1])
+			philos[index]->fork_right = philos[index + 1]->fork;
+		else
+			philos[index]->fork_right = philos[0]->fork;
+		index++;
 	}
 }
 
-t_philo	*create_simulation(char *argv[])
+t_philo	**create_simulation(char *argv[])
 {
-	t_philo	*philos;
+	t_philo	**philos;
 	int		n;
 	t_data	*data;
+	int	index;
 
+	index = 0;
 	philos = 0;
 	n = ft_atoi(argv[0]);
 	data = ft_calloc(1, sizeof(t_data));
@@ -48,10 +53,12 @@ t_philo	*create_simulation(char *argv[])
 	pthread_mutex_init(data->end_simulation_lock, NULL);
 	if (argv[4])
 		data->meals_must_eat = ft_atoi(argv[4]);
-	while (n)
+	philos = (t_philo **) ft_calloc(n + 1, sizeof(t_philo **));
+	while (index < n)
 	{
-		add_to_table(&philos, data);
-		n--;
+		philos[index] = create_philo(data);
+		index++;
 	}
+	link_forks(philos);
 	return (philos);
 }

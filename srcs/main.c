@@ -2,7 +2,7 @@
 
 int	main(int argc, char *argv[])
 {
-	t_philo	*philos;
+	t_philo	**philos;
 
 	if (argc > 6 || argc < 5)
 		return (1);

@@ -34,13 +34,12 @@ typedef struct s_philo
 	int				n_meals;
 	pthread_t		thread;
 	pthread_mutex_t	*fork;
+	pthread_mutex_t	*fork_right;
 	t_data			*data;
-	struct s_philo	*left;
-	struct s_philo	*right;
 }	t_philo;
 
-t_philo		*create_simulation(char *argv[]);
-void		start_simulation(t_philo *philos);
+t_philo		**create_simulation(char *argv[]);
+void		start_simulation(t_philo **philos);
 void		message(char *action, t_philo *philo);
 
 //Validate
