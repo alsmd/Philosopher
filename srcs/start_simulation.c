@@ -3,33 +3,23 @@
 
 int	try_get_fork(t_philo *philo)
 {
-	if (philo->fork->__align == 0)
-		pthread_mutex_lock(philo->fork);
-	else
-		return (0);
-	if (philo->fork_right->__align == 0)
-	{
-		pthread_mutex_lock(philo->fork_right);
-		message(TAKEN_FORK, philo);
-	}
-	else
-	{
-		pthread_mutex_unlock(philo->fork);
-		return (0);
-	}
+	pthread_mutex_lock(philo->fork);
+	pthread_mutex_lock(philo->fork_right);
+	message(TAKEN_FORK, philo);
 	return (1);
 }
 
 int	start_eating(t_philo *philo)
 {
-	pthread_mutex_lock(philo->last_meal_locker);
 	message(EATING, philo);
 	usleep(philo->data->time_to_eat * 1000);
+	
+	pthread_mutex_lock(philo->last_meal_locker);
 	set_time(&philo->last_meal);
+	philo->n_meals += 1;
 	pthread_mutex_unlock(philo->last_meal_locker);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->fork_right);
-	philo->n_meals += 1;
 	if (philo->n_meals == philo->data->meals_must_eat)
 		return (1);
 	message(SLEEPING, philo);
