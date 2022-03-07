@@ -4,6 +4,7 @@
 int	try_get_fork(t_philo *philo)
 {
 	pthread_mutex_lock(philo->fork);
+	message(TAKEN_FORK, philo);
 	pthread_mutex_lock(philo->fork_right);
 	message(TAKEN_FORK, philo);
 	return (1);
@@ -87,10 +88,7 @@ void	*death_checker(void *p)
 	{
 		check_is_dead(philo[index]);
 		if (philo[index]->data->end_simulation)
-		{
-			printf("%d\n", philo[index]->n_meals);
 			return (NULL);
-		}
 		index++;
 		if (philo[index] == NULL)
 			index = 0;
@@ -104,15 +102,27 @@ void	start_simulation(t_philo **philos)
 	index = 0;
 	pthread_create(&info, NULL, &death_checker, philos);
 	set_time(&philos[0]->data->start_simulation);
-	while (philos[index])
+	if (philos[1] == 0)
 	{
-		pthread_create(&philos[index]->thread, NULL, &lifespan, philos[index]);
-		index++;
+		pthread_mutex_lock(philos[0]->last_meal_locker);
+		set_time(&philos[0]->last_meal);
+		pthread_mutex_unlock(philos[0]->last_meal_locker);
+		message(TAKEN_FORK, philos[0]);
+		pthread_join(info, NULL);
 	}
-	index = 0;
-	while (philos[index])
+	else
 	{
-		pthread_join(philos[index]->thread, NULL);
-		index++;
+		while (philos[index])
+		{
+			pthread_create(&philos[index]->thread, NULL, &lifespan, philos[index]);
+			index++;
+		}
+		index = 0;
+		while (philos[index])
+		{
+			pthread_join(philos[index]->thread, NULL);
+			index++;
+		}
 	}
+	
 }
