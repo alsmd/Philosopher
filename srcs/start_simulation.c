@@ -42,17 +42,17 @@ void	check_is_dead(t_philo *philo)
 	struct	timeval current_time;
 
 	gettimeofday(&current_time, NULL);
-	//pthread_mutex_lock(philo->last_meal_locker);
-	if ((get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die))
+	pthread_mutex_lock(philo->last_meal_locker);
+	if (philo->last_meal && (get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die))
 	{
-//		pthread_mutex_unlock(philo->last_meal_locker);
+		pthread_mutex_unlock(philo->last_meal_locker);
 		message(DIED, philo);
 		pthread_mutex_lock(philo->data->end_simulation_lock);
 		philo->data->end_simulation = 1;
 		pthread_mutex_unlock(philo->data->end_simulation_lock);
 	}
-//	else
-//		pthread_mutex_unlock(philo->last_meal_locker);
+	else
+		pthread_mutex_unlock(philo->last_meal_locker);
 }
 
 void	*lifespan(void *p)
@@ -63,19 +63,16 @@ void	*lifespan(void *p)
 
 	first = 1;
 	philo = (t_philo *)p;
+	if (philo->id % 2 == 0)
+		usleep(5000);
 	while (1)
 	{
-		if (!philo->data->start_simulation)
-			continue ;
 		if (first)
 		{
 			pthread_mutex_lock(philo->last_meal_locker);
 			set_time(&philo->last_meal);
 			pthread_mutex_unlock(philo->last_meal_locker);
 		}
-		/* if (philo->id % 2 == 0)
-			usleep(5000); */
-		check_is_dead(philo);
 		if (philo->data->end_simulation)
 			break;
 		first = 0;
@@ -96,10 +93,7 @@ void	*death_checker(void *p)
 	philo = (t_philo **)p;
 	while (1)
 	{
-		if (!philo[index]->data->start_simulation)
-			continue ;
-		if (philo[index]->last_meal);
-			check_is_dead(philo[index]);
+		check_is_dead(philo[index]);
 		if (philo[index]->data->end_simulation)
 			return (NULL);
 		index++;
@@ -113,18 +107,17 @@ void	start_simulation(t_philo **philos)
 	pthread_t		info;
 
 	index = 0;
+	pthread_create(&info, NULL, &death_checker, philos);
+	set_time(&philos[0]->data->start_simulation);
 	while (philos[index])
 	{
 		pthread_create(&philos[index]->thread, NULL, &lifespan, philos[index]);
 		index++;
 	}
-	set_time(&philos[0]->data->start_simulation);
-	//pthread_create(&info, NULL, &death_checker, philos);
 	index = 0;
 	while (philos[index])
 	{
 		pthread_join(philos[index]->thread, NULL);
 		index++;
 	}
-	//pthread_join(info, NULL);
 }
