@@ -23,8 +23,8 @@ int	try_get_fork(t_philo *philo)
 int	start_eating(t_philo *philo)
 {
 	message(EATING, philo);
-	usleep(philo->data->time_to_eat * 1000);
 	pthread_mutex_lock(philo->last_meal_locker);
+	usleep(philo->data->time_to_eat * 1000);
 	set_time(&philo->last_meal);
 	pthread_mutex_unlock(philo->last_meal_locker);
 	pthread_mutex_unlock(philo->fork);
