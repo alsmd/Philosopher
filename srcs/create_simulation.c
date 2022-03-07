@@ -8,8 +8,11 @@ void	add_to_table(t_philo **list, t_data *data)
 
 	new_philo = ft_calloc(1, sizeof(t_philo));
 	new_philo->fork = ft_calloc(1, sizeof(pthread_mutex_t));
+	new_philo->last_meal_locker = ft_calloc(1, sizeof(pthread_mutex_t));
 	pthread_mutex_init(new_philo->fork, NULL);
+	pthread_mutex_init(new_philo->last_meal_locker, NULL);
 	new_philo->data = data;
+	new_philo->last_meal = -1;
 	id++;
 	new_philo->id = id;
 	begin = *list;
@@ -22,6 +25,7 @@ void	add_to_table(t_philo **list, t_data *data)
 			begin = begin->right;
 		begin->right = new_philo;
 		new_philo->left = begin;
+		new_philo->right = *list;
 	}
 }
 

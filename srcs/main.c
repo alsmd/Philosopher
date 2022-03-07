@@ -17,8 +17,8 @@ void	message(char *action, t_philo *philo)
 {
 	struct	timeval current_time;
 
-	pthread_mutex_lock(philo->data->message_lock);
 	gettimeofday(&current_time, NULL);
+	pthread_mutex_lock(philo->data->message_lock);
 	if (!philo->data->end_simulation)
 		printf("%ld %d %s\n", get_miliseconds(current_time) - philo->data->start_simulation, philo->id, action);
 	pthread_mutex_unlock(philo->data->message_lock);

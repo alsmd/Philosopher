@@ -23,13 +23,14 @@ int	try_get_fork(t_philo *philo)
 int	start_eating(t_philo *philo)
 {
 	long int		start_eating;
-	struct	timeval finish_eating;
+	long int		 finish_eating;
 
 	message(EATING, philo);
 	set_time(&start_eating);
-	gettimeofday(&finish_eating, NULL);
-	while (get_miliseconds(finish_eating) - start_eating <= philo->data->time_to_eat)
-		gettimeofday(&finish_eating, NULL);
+	set_time(&finish_eating);
+	while (finish_eating - start_eating <= philo->data->time_to_eat)
+		set_time(&finish_eating);
+	set_time(&philo->last_meal);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->left->fork);
 	philo->n_meals++;
@@ -37,7 +38,6 @@ int	start_eating(t_philo *philo)
 		return (1);
 	message(SLEEPING, philo);
 	usleep(philo->data->time_to_sleep * 1000);
-	set_time(&philo->last_meal);
 	return (0);
 }
 
@@ -46,13 +46,17 @@ void	check_is_dead(t_philo *philo)
 	struct	timeval current_time;
 
 	gettimeofday(&current_time, NULL);
-	if ((get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die))
+	pthread_mutex_lock(philo->last_meal_locker);
+	if ((get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die) && philo->last_meal != -1)
 	{
+		pthread_mutex_unlock(philo->last_meal_locker);
 		message(DIED, philo);
 		pthread_mutex_lock(philo->data->end_simulation_lock);
 		philo->data->end_simulation = 1;
 		pthread_mutex_unlock(philo->data->end_simulation_lock);
 	}
+	else
+		pthread_mutex_unlock(philo->last_meal_locker);
 }
 
 void	*lifespan(void *p)
@@ -67,16 +71,9 @@ void	*lifespan(void *p)
 	{
 		if (!philo->data->start_simulation)
 			continue ;
-		if (first)
-		{
-			if (philo->id % 2 == 0)
-				usleep(5000);
-			set_time(&philo->last_meal);
-		}
-		first = 0;
-		check_is_dead(philo);
 		if (philo->data->end_simulation)
 			break;
+		first = 0;
 		if (!try_get_fork(philo))
 			continue ;
 		if (start_eating(philo))
@@ -85,11 +82,28 @@ void	*lifespan(void *p)
 	}
 }
 
-void	start_simulation(t_philo *philos)
+void	*death_checker(void *p)
 {
 	t_philo	*begin;
+
+	begin = (t_philo *)p;
+	while (begin)
+	{
+		if (!begin->data->start_simulation)
+			continue ;
+		check_is_dead(begin);
+		if (begin->data->end_simulation)
+			return (NULL);
+		begin = begin->right;
+	}
+}
+void	start_simulation(t_philo *philos)
+{
+	t_philo			*begin;
+	pthread_t		info;
 	int		first;
 
+	begin = philos;
 	first = 1;
 	begin = philos;
 	while (begin && (begin != philos || first))
@@ -98,6 +112,7 @@ void	start_simulation(t_philo *philos)
 		begin = begin->right;
 		first = 0;
 	}
+	pthread_create(&info, NULL, &death_checker, philos);
 	set_time(&philos->data->start_simulation);
 	first = 1;
 	begin = philos;
@@ -107,4 +122,5 @@ void	start_simulation(t_philo *philos)
 		begin = begin->right;
 		first = 0;
 	}
+	pthread_join(info, NULL);
 }

@@ -29,6 +29,7 @@ typedef struct s_philo
 {
 	int				id;
 	char			*name;
+	pthread_mutex_t	*last_meal_locker;
 	long int		last_meal;
 	int				n_meals;
 	pthread_t		thread;
