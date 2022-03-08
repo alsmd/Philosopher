@@ -13,13 +13,13 @@ int	try_get_fork(t_philo *philo)
 int	start_eating(t_philo *philo)
 {
 	philo->is_eating = TRUE;
-	message(EATING, philo);
-	usleep(philo->data->time_to_eat * 1000);
 	pthread_mutex_lock(philo->last_meal_locker);
 	set_time(&philo->last_meal);
 	philo->is_eating = FALSE;
 	philo->n_meals += 1;
 	pthread_mutex_unlock(philo->last_meal_locker);
+	message(EATING, philo);
+	usleep(philo->data->time_to_eat * 1000);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->fork_right);
 	message(SLEEPING, philo);
