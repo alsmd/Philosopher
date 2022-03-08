@@ -12,16 +12,16 @@ int	try_get_fork(t_philo *philo)
 
 int	start_eating(t_philo *philo)
 {
-	pthread_mutex_lock(philo->last_meal_locker);
+	philo->is_eating = TRUE;
 	message(EATING, philo);
 	usleep(philo->data->time_to_eat * 1000);
+	philo->is_eating = FALSE;
+	pthread_mutex_lock(philo->last_meal_locker);
 	set_time(&philo->last_meal);
 	philo->n_meals += 1;
 	pthread_mutex_unlock(philo->last_meal_locker);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->fork_right);
-	if (philo->n_meals == philo->data->meals_must_eat)
-		return (1);
 	message(SLEEPING, philo);
 	usleep(philo->data->time_to_sleep * 1000);
 	return (0);
@@ -55,7 +55,7 @@ void	*lifespan(void *p)
 	philo = (t_philo *)p;
 	if (philo->id % 2 == 0)
 		usleep(5000);
-	while (1)
+	while (!philo->data->end_simulation)
 	{
 		if (first)
 		{
@@ -63,8 +63,6 @@ void	*lifespan(void *p)
 			set_time(&philo->last_meal);
 			pthread_mutex_unlock(philo->last_meal_locker);
 		}
-		if (philo->data->end_simulation)
-			break;
 		first = 0;
 		if (!try_get_fork(philo))
 			continue ;
@@ -76,22 +74,49 @@ void	*lifespan(void *p)
 	}
 }
 
+int	check_dissatisfaction(t_philo **philo)
+{
+	int	index;
+
+	if (philo[0]->data->meals_must_eat == -1)
+		return (1);
+	index = 0;
+	while (philo[index])
+	{
+		pthread_mutex_lock(philo[index]->last_meal_locker);
+		if (philo[index]->n_meals < philo[index]->data->meals_must_eat)
+		{
+			pthread_mutex_unlock(philo[index]->last_meal_locker);
+			return (1);
+		}
+		pthread_mutex_unlock(philo[index]->last_meal_locker);
+		index++;
+	}
+	pthread_mutex_lock(philo[0]->data->end_simulation_lock);
+	philo[0]->data->end_simulation = 1;
+	pthread_mutex_unlock(philo[0]->data->end_simulation_lock);
+	return (0);
+}
+
 void	*death_checker(void *p)
 {
 	t_philo	**philo;
 	int		index;
 
-	index = 0;
 	philo = (t_philo **)p;
-	while (1)
+	while (check_dissatisfaction(philo))
 	{
-		check_is_dead(philo[index]);
-		if (philo[index]->data->end_simulation)
-			return (NULL);
-		index++;
-		if (philo[index] == NULL)
-			index = 0;
+		index = 0;
+		while (philo[index])
+		{
+			if (philo[index]->is_eating == FALSE)
+				check_is_dead(philo[index]);
+			if (philo[index]->data->end_simulation)
+				return (NULL);
+			index++;
+		}
 	}
+
 }
 void	start_simulation(t_philo **philos)
 {
@@ -99,29 +124,32 @@ void	start_simulation(t_philo **philos)
 	pthread_t		info;
 
 	index = 0;
-	pthread_create(&info, NULL, &death_checker, philos);
-	set_time(&philos[0]->data->start_simulation);
 	if (philos[1] == 0)
 	{
+		set_time(&philos[0]->data->start_simulation);
 		pthread_mutex_lock(philos[0]->last_meal_locker);
 		set_time(&philos[0]->last_meal);
 		pthread_mutex_unlock(philos[0]->last_meal_locker);
 		message(TAKEN_FORK, philos[0]);
+		pthread_create(&info, NULL, &death_checker, philos);
 		pthread_join(info, NULL);
 	}
 	else
 	{
+		set_time(&philos[0]->data->start_simulation);
 		while (philos[index])
 		{
 			pthread_create(&philos[index]->thread, NULL, &lifespan, philos[index]);
 			index++;
 		}
+		pthread_create(&info, NULL, &death_checker, philos);
 		index = 0;
 		while (philos[index])
 		{
 			pthread_join(philos[index]->thread, NULL);
 			index++;
 		}
+		pthread_join(info, NULL);
 	}
 	
 }

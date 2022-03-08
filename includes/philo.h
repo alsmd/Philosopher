@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdio.h>
+#define FALSE 0
+#define TRUE 1
 #define TAKEN_FORK "has taken a fork"
 #define EATING "is eating"
 #define SLEEPING "is sleeping"
@@ -30,8 +32,10 @@ typedef struct s_philo
 	int				id;
 	char			*name;
 	pthread_mutex_t	*last_meal_locker;
+	pthread_mutex_t	*is_eating_locker;
 	long int		last_meal;
 	int				n_meals;
+	int				is_eating;
 	pthread_t		thread;
 	pthread_mutex_t	*fork;
 	pthread_mutex_t	*fork_right;

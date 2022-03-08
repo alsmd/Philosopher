@@ -9,8 +9,10 @@ t_philo	*create_philo(t_data *data)
 	new_philo = ft_calloc(1, sizeof(t_philo));
 	new_philo->fork = ft_calloc(1, sizeof(pthread_mutex_t));
 	new_philo->last_meal_locker = ft_calloc(1, sizeof(pthread_mutex_t));
+	new_philo->is_eating_locker = ft_calloc(1, sizeof(pthread_mutex_t));
 	pthread_mutex_init(new_philo->fork, NULL);
 	pthread_mutex_init(new_philo->last_meal_locker, NULL);
+	pthread_mutex_init(new_philo->is_eating_locker, NULL);
 	new_philo->data = data;
 	id++;
 	new_philo->id = id;
