@@ -7,6 +7,7 @@ int	try_get_fork(t_philo *philo)
 	message(TAKEN_FORK, philo);
 	pthread_mutex_lock(philo->fork_right);
 	message(TAKEN_FORK, philo);
+
 	philo->is_eating = TRUE;
 	pthread_mutex_lock(philo->last_meal_locker);
 	set_time(&philo->last_meal);
@@ -35,7 +36,7 @@ void	check_is_dead(t_philo *philo)
 
 	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(philo->last_meal_locker);
-	if (philo->last_meal && (get_miliseconds(current_time) - philo->last_meal >= philo->data->time_to_die) && philo->n_meals != philo->data->meals_must_eat)
+	if (philo->last_meal && (get_miliseconds(current_time) - philo->last_meal > philo->data->time_to_die) && philo->n_meals != philo->data->meals_must_eat)
 	{
 		pthread_mutex_unlock(philo->last_meal_locker);
 		message(DIED, philo);
