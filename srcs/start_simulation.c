@@ -7,17 +7,17 @@ int	try_get_fork(t_philo *philo)
 	message(TAKEN_FORK, philo);
 	pthread_mutex_lock(philo->fork_right);
 	message(TAKEN_FORK, philo);
-	return (1);
-}
-
-int	start_eating(t_philo *philo)
-{
 	philo->is_eating = TRUE;
 	pthread_mutex_lock(philo->last_meal_locker);
 	set_time(&philo->last_meal);
 	philo->is_eating = FALSE;
 	philo->n_meals += 1;
 	pthread_mutex_unlock(philo->last_meal_locker);
+	return (1);
+}
+
+int	start_eating(t_philo *philo)
+{
 	message(EATING, philo);
 	usleep(philo->data->time_to_eat * 1000);
 	pthread_mutex_unlock(philo->fork);
