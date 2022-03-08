@@ -10,20 +10,22 @@ int	try_get_fork(t_philo *philo)
 	philo->is_eating = TRUE;
 	pthread_mutex_lock(philo->last_meal_locker);
 	set_time(&philo->last_meal);
+	message(EATING, philo);
 	philo->is_eating = FALSE;
 	philo->n_meals += 1;
 	pthread_mutex_unlock(philo->last_meal_locker);
-	return (1);
-}
 
-int	start_eating(t_philo *philo)
-{
-	message(EATING, philo);
 	usleep(philo->data->time_to_eat * 1000);
 	pthread_mutex_unlock(philo->fork);
 	pthread_mutex_unlock(philo->fork_right);
 	message(SLEEPING, philo);
 	usleep(philo->data->time_to_sleep * 1000);
+	return (1);
+}
+
+int	start_eating(t_philo *philo)
+{
+	
 	return (0);
 }
 
@@ -66,10 +68,6 @@ void	*lifespan(void *p)
 		first = 0;
 		if (!try_get_fork(philo))
 			continue ;
-		if (start_eating(philo))
-			break ;
-		if (philo->id % 2 == 0)
-			usleep(5000);
 		message(THINKING, philo);
 	}
 }
