@@ -30,7 +30,8 @@ void	check_is_dead(t_philo *philo)
 
 	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(philo->last_meal_locker);
-	if (philo->last_meal && (get_miliseconds(current_time) - philo->last_meal > philo->data->time_to_die) && philo->n_meals != philo->data->meals_must_eat)
+	if (get_miliseconds(current_time) - philo->last_meal > philo->data->time_to_die \
+		&& philo->last_meal != -1)
 	{
 		pthread_mutex_unlock(philo->last_meal_locker);
 		message(DIED, philo);

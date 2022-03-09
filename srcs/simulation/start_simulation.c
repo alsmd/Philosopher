@@ -10,13 +10,13 @@ void	start_simulation(t_philo **philos)
 		one_philo_routine(philos);
 	else
 	{
-		set_time(&philos[0]->data->start_simulation);
 		while (philos[index])
 		{
 			pthread_create(&philos[index]->thread, NULL, &lifespan, philos[index]);
 			index++;
 		}
 		pthread_create(&info, NULL, &death_checker, philos);
+		set_time(&philos[0]->data->start_simulation);
 		index = 0;
 		while (philos[index])
 		{
