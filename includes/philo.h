@@ -46,6 +46,16 @@ t_philo		**create_simulation(char *argv[]);
 void		start_simulation(t_philo **philos);
 void		message(char *action, t_philo *philo);
 
+
+//Routines
+void		one_philo_routine(t_philo **philos);
+void		*lifespan(void *p);
+void		*death_checker(void *p);
+
+//Checker
+void	check_is_dead(t_philo *philo);
+int		check_dissatisfaction(t_philo **philo);
+
 //Validate
 int			validate(char *argv[]);
 
