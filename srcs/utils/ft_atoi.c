@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/09 11:11:45 by flda-sil          #+#    #+#             */
+/*   Updated: 2022/03/09 11:20:41 by flda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <philo.h>
 
 static int	is_space(char c)
@@ -7,7 +19,7 @@ static int	is_space(char c)
 	return (0);
 }
 
-static int	get_overflow_n(int	sign)
+static int	get_overflow_n(int sign)
 {
 	if (sign == 1)
 		return (-1);

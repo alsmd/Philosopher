@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   checker.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/09 11:12:44 by flda-sil          #+#    #+#             */
+/*   Updated: 2022/03/09 11:15:27 by flda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <philo.h>
 
 int	check_dissatisfaction(t_philo **philo)
@@ -24,21 +36,22 @@ int	check_dissatisfaction(t_philo **philo)
 	return (0);
 }
 
-void	check_is_dead(t_philo *philo)
+int	check_is_dead(t_philo *philo)
 {
-	struct	timeval current_time;
+	struct timeval	current_time;
 
 	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(philo->last_meal_locker);
-	if (get_miliseconds(current_time) - philo->last_meal > philo->data->time_to_die \
-		&& philo->last_meal != -1)
+	if (get_miliseconds(current_time) - philo->last_meal > \
+		philo->data->time_to_die && philo->last_meal != -1)
 	{
 		pthread_mutex_unlock(philo->last_meal_locker);
 		message(DIED, philo);
 		pthread_mutex_lock(philo->data->end_simulation_lock);
 		philo->data->end_simulation = 1;
 		pthread_mutex_unlock(philo->data->end_simulation_lock);
+		return (1);
 	}
-	else
-		pthread_mutex_unlock(philo->last_meal_locker);
+	pthread_mutex_unlock(philo->last_meal_locker);
+	return (0);
 }

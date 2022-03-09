@@ -1,19 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/09 11:13:54 by flda-sil          #+#    #+#             */
+/*   Updated: 2022/03/09 11:13:55 by flda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
-#define PHILO_H
-#include <unistd.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <sys/time.h>
-#include <stdio.h>
-#include <limits.h>
-#include <stdio.h>
-#define FALSE 0
-#define TRUE 1
-#define TAKEN_FORK "has taken a fork"
-#define EATING "is eating"
-#define SLEEPING "is sleeping"
-#define THINKING "is thinking"
-#define DIED "died"
+# define PHILO_H
+# include <unistd.h>
+# include <stdlib.h>
+# include <pthread.h>
+# include <sys/time.h>
+# include <stdio.h>
+# include <limits.h>
+# include <stdio.h>
+# define FALSE 0
+# define TRUE 1
+# define TAKEN_FORK "has taken a fork"
+# define EATING "is eating"
+# define SLEEPING "is sleeping"
+# define THINKING "is thinking"
+# define DIED "died"
 
 typedef struct s_data
 {
@@ -45,7 +57,7 @@ typedef struct s_philo
 t_philo		**create_simulation(char *argv[]);
 void		start_simulation(t_philo **philos);
 void		message(char *action, t_philo *philo);
-
+void		free_simulation(t_philo **philos);
 
 //Routines
 void		one_philo_routine(t_philo **philos);
@@ -53,12 +65,11 @@ void		*lifespan(void *p);
 void		*death_checker(void *p);
 
 //Checker
-void	check_is_dead(t_philo *philo);
-int		check_dissatisfaction(t_philo **philo);
+int			check_is_dead(t_philo *philo);
+int			check_dissatisfaction(t_philo **philo);
 
 //Validate
 int			validate(char *argv[]);
-
 
 //utils
 int			is_number(char c);

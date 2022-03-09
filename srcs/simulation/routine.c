@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/09 11:12:22 by flda-sil          #+#    #+#             */
+/*   Updated: 2022/03/09 11:18:29 by flda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <philo.h>
 
 void	one_philo_routine(t_philo **philos)
@@ -11,7 +23,7 @@ void	one_philo_routine(t_philo **philos)
 	pthread_join(info, NULL);
 }
 
-static void	lunche(t_philo *philo)
+static void	lunch(t_philo *philo)
 {
 	pthread_mutex_lock(philo->fork);
 	pthread_mutex_lock(philo->fork_right);
@@ -29,6 +41,15 @@ static void	lunche(t_philo *philo)
 	pthread_mutex_unlock(philo->fork_right);
 }
 
+void	first_iteration(t_philo *philo)
+{
+	if (philo->id % 2 == 0)
+		usleep(5000);
+	pthread_mutex_lock(philo->last_meal_locker);
+	set_time(&philo->last_meal);
+	pthread_mutex_unlock(philo->last_meal_locker);
+}
+
 void	*lifespan(void *p)
 {
 	t_philo	*philo;
@@ -42,15 +63,11 @@ void	*lifespan(void *p)
 		if (!philo->data->start_simulation)
 			continue ;
 		if (first)
-		{
-			if (philo->id % 2 == 0)
-				usleep(5000);
-			pthread_mutex_lock(philo->last_meal_locker);
-			set_time(&philo->last_meal);
-			pthread_mutex_unlock(philo->last_meal_locker);
-		}
+			first_iteration(philo);
 		first = 0;
-		lunche(philo);
+		if (check_is_dead(philo))
+			return (NULL);
+		lunch(philo);
 		if (philo->n_meals == philo->data->meals_must_eat)
 			return (NULL);
 		message(SLEEPING, philo);
@@ -68,7 +85,7 @@ void	*death_checker(void *p)
 	while (check_dissatisfaction(philo))
 	{
 		if (!philo[0]->data->start_simulation)
-			continue;
+			continue ;
 		index = 0;
 		while (philo[index])
 		{
