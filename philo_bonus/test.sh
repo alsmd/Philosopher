@@ -1,8 +1,8 @@
 #!/bin/bash
-# make -C philo_bonus && clear
-# exe=./philo_bonus/philo_bonus
 make && clear
-exe=./philo
+exe=./philo_bonus
+#make && clear
+#exe=./philo
 
 tests=10
 

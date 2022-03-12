@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:13:54 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/09 11:13:55 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 14:08:12 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,17 @@
 # include <stdio.h>
 # include <limits.h>
 # include <stdio.h>
+
+//Kill
+#include <signal.h>
+//Wait
+#include <sys/types.h>
+#include <sys/wait.h>
+//Sema
+# include <fcntl.h>           /* For O_* constants */
+# include <sys/stat.h>        /* For mode constants */
+# include <semaphore.h>
+
 # define FALSE 0
 # define TRUE 1
 # define TAKEN_FORK "has taken a fork"
@@ -26,31 +37,33 @@
 # define SLEEPING "is sleeping"
 # define THINKING "is thinking"
 # define DIED "died"
+# define SEM_FORKS_AVAIABLES "/forks_avaiables"
+# define SEM_PHILO_DEAD "/philo_dead"
+# define SEM_PHILO_DEAD_LOG "/philo_dead_log"
+# define SEM_PHILO_SATISFIED "/philo_satisfied"
 
 typedef struct s_data
 {
-	pthread_mutex_t	*message_lock;
+	sem_t			*forks;
+	sem_t			*philo_is_dead;
+	sem_t			*philo_is_dead_log;
+	sem_t			*philo_is_satisfied;
 	long int		time_to_die;
 	long int		time_to_eat;
 	long int		time_to_sleep;
 	long int		meals_must_eat;
 	long int		start_simulation;
-	int				end_simulation;
-	pthread_mutex_t	*end_simulation_lock;
+	int				n_philo;
 }	t_data;
 
 typedef struct s_philo
 {
 	int				id;
-	char			*name;
-	pthread_mutex_t	*last_meal_locker;
-	pthread_mutex_t	*is_eating_locker;
 	long int		last_meal;
+	sem_t			*last_meal_sem;
 	int				n_meals;
 	int				is_eating;
-	pthread_t		thread;
-	pthread_mutex_t	*fork;
-	pthread_mutex_t	*fork_right;
+	int				process_id;
 	t_data			*data;
 }	t_philo;
 
@@ -62,11 +75,11 @@ void		free_simulation(t_philo **philos);
 //Routines
 void		one_philo_routine(t_philo **philos);
 void		*lifespan(void *p);
-void		*death_checker(void *p);
 
 //Checker
-int			check_is_dead(t_philo *philo);
+void		*check_is_dead(void *p);
 int			check_dissatisfaction(t_philo **philo);
+void		check_simulation_end(t_philo **philos);
 
 //Validate
 int			validate(char *argv[]);
@@ -78,5 +91,7 @@ int			ft_atoi(const char *nptr);
 void		*ft_calloc(size_t nmemb, size_t size);
 void		set_time(long int *i);
 long int	get_miliseconds(struct timeval t);
+void		*unlock(pthread_mutex_t	*m);
+char		*ft_itoa(int n);
 
 #endif

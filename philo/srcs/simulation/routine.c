@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:12:22 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 11:35:35 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 15:38:55 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,13 @@ static void	lunch(t_philo *philo)
 	message(TAKEN_FORK, philo);
 	message(TAKEN_FORK, philo);
 	pthread_mutex_lock(philo->last_meal_locker);
+	if (philo->data->end_simulation)
+	{
+		pthread_mutex_unlock(philo->last_meal_locker);
+		pthread_mutex_unlock(philo->fork_right);
+		pthread_mutex_unlock(philo->fork);
+		return ;
+	}
 	set_time(&philo->last_meal);
 	philo->n_meals += 1;
 	pthread_mutex_unlock(philo->last_meal_locker);
@@ -63,18 +70,15 @@ void	*lifespan(void *p)
 		if (check_is_dead(philo))
 			return (NULL);
 		lunch(philo);
+		pthread_mutex_lock(philo->data->end_simulation_lock);
+		if (philo->data->end_simulation)
+			return (unlock(philo->data->end_simulation_lock));
+		pthread_mutex_unlock(philo->data->end_simulation_lock);
 		if (philo->n_meals == philo->data->meals_must_eat)
 			return (NULL);
 		message(SLEEPING, philo);
 		usleep(philo->data->time_to_sleep * 1000);
 		message(THINKING, philo);
-		pthread_mutex_lock(philo->data->end_simulation_lock);
-		if (philo->data->end_simulation)
-		{
-			pthread_mutex_unlock(philo->data->end_simulation_lock);
-			return (NULL);
-		}
-		pthread_mutex_unlock(philo->data->end_simulation_lock);
 	}
 	return (NULL);
 }
@@ -95,10 +99,7 @@ void	*death_checker(void *p)
 			check_is_dead(philo[index]);
 			pthread_mutex_lock(philo[0]->data->end_simulation_lock);
 			if (philo[0]->data->end_simulation)
-			{
-				pthread_mutex_unlock(philo[0]->data->end_simulation_lock);
-				return (NULL);
-			}
+				return (unlock(philo[0]->data->end_simulation_lock));
 			pthread_mutex_unlock(philo[0]->data->end_simulation_lock);
 			usleep(1000);
 			index++;

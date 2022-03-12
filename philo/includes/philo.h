@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:13:54 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 08:52:55 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 15:42:47 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,9 @@ typedef struct s_data
 typedef struct s_philo
 {
 	int				id;
-	char			*name;
 	pthread_mutex_t	*last_meal_locker;
-	pthread_mutex_t	*is_eating_locker;
 	long int		last_meal;
 	int				n_meals;
-	int				is_eating;
 	pthread_t		thread;
 	pthread_mutex_t	*fork;
 	pthread_mutex_t	*fork_right;
@@ -79,5 +76,6 @@ int			ft_atoi(const char *nptr);
 void		*ft_calloc(size_t nmemb, size_t size);
 void		set_time(long int *i);
 long int	get_miliseconds(struct timeval t);
+void		*unlock(pthread_mutex_t	*m);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:11:34 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 09:27:32 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 15:43:23 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,13 @@ void	free_simulation(t_philo **philos)
 	int	index;
 
 	free_mutex(philos[0]->data->end_simulation_lock);
+	free_mutex(philos[0]->data->start_simulation_lock);
 	free_mutex(philos[0]->data->message_lock);
 	free(philos[0]->data);
 	index = 0;
 	while (philos[index])
 	{
 		free_mutex(philos[index]->fork);
-		free_mutex(philos[index]->is_eating_locker);
 		free_mutex(philos[index]->last_meal_locker);
 		free(philos[index]);
 		index++;

@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:12:33 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 08:53:49 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 15:43:44 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,8 @@ t_philo	*create_philo(t_data *data)
 	new_philo->fork = ft_calloc(1, sizeof(pthread_mutex_t));
 	new_philo->last_meal = -1;
 	new_philo->last_meal_locker = ft_calloc(1, sizeof(pthread_mutex_t));
-	new_philo->is_eating_locker = ft_calloc(1, sizeof(pthread_mutex_t));
 	pthread_mutex_init(new_philo->fork, NULL);
 	pthread_mutex_init(new_philo->last_meal_locker, NULL);
-	pthread_mutex_init(new_philo->is_eating_locker, NULL);
 	new_philo->data = data;
 	id++;
 	new_philo->id = id;

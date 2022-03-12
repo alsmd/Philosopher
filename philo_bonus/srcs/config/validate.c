@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:12:38 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/09 11:12:39 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 11:49:08 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,4 +32,10 @@ int	validate(char *argv[])
 		index++;
 	}
 	return (0);
+}
+
+void	*unlock(pthread_mutex_t	*m)
+{
+	pthread_mutex_unlock(m);
+	return (NULL);
 }

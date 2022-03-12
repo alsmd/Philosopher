@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:11:48 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/09 11:11:59 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 08:40:34 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	*ft_calloc(size_t nmemb, size_t size)
 {
 	void	*r;
-	int		index;
+	size_t	index;
 
 	r = malloc(nmemb * size);
 	if (r)
