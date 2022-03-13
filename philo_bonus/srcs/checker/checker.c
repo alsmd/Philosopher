@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:12:44 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 14:23:35 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 22:46:06 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,23 @@
 
 void	*check_is_dead(void *p)
 {
-	t_philo	*philo;
+	t_philo			*philo;
 	struct timeval	current_time;
 
 	philo = (t_philo *)p;
 	while (1)
 	{
 		gettimeofday(&current_time, NULL);
+		sem_wait(philo->died_sem);
 		if (get_miliseconds(current_time) - philo->last_meal > \
 			philo->data->time_to_die && philo->last_meal != -1)
 		{
-			sem_wait(philo->data->philo_is_dead_log);
+			sem_post(philo->died_sem);
 			message(DIED, philo);
 			sem_post(philo->data->philo_is_dead);
 		}
+		else
+			sem_post(philo->died_sem);
 		usleep(1000);
 	}
 }

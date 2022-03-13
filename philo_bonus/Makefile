@@ -1,7 +1,7 @@
 SRCS =	./srcs/main.c ./srcs/config/create_simulation.c ./srcs/config/validate.c ./srcs/simulation/start_simulation.c \
 		./srcs/checker/checker.c ./srcs/simulation/routine.c \
 		./srcs/utils/ft_atoi.c ./srcs/utils/ft_calloc.c ./srcs/utils/ft_strlen.c ./srcs/utils/is_number.c ./srcs/utils/time.c \
-		./srcs/utils/ft_itoa.c
+		./srcs/utils/ft_itoa.c ./srcs/utils/ft_strncmp.c
 
 OBJS = $(SRCS:.c=.o)
 

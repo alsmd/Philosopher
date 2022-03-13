@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:11:34 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 14:22:57 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 22:36:07 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,10 @@ void	message(char *action, t_philo *philo)
 
 	gettimeofday(&current_time, NULL);
 	time = get_miliseconds(current_time) - philo->data->start_simulation;
+	sem_wait(philo->data->philo_log);
 	printf("%ld %d %s\n", time, philo->id, action);
+	if (ft_strncmp(DIED, action, -1))
+		sem_post(philo->data->philo_log);
 }
 
 void	free_sem(sem_t	*s)
@@ -46,9 +49,9 @@ void	free_sem(sem_t	*s)
 void	free_simulation(t_philo **philos)
 {
 	int	index;
-	
+
 	free_sem(philos[0]->data->forks);
-	free_sem(philos[0]->data->philo_is_dead_log);
+	free_sem(philos[0]->data->philo_log);
 	free_sem(philos[0]->data->philo_is_dead);
 	free_sem(philos[0]->data->philo_is_satisfied);
 	free(philos[0]->data);

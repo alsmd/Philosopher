@@ -6,7 +6,7 @@
 /*   By: flda-sil <flda-sil@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 11:13:54 by flda-sil          #+#    #+#             */
-/*   Updated: 2022/03/12 14:08:12 by flda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/12 22:35:14 by flda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@
 # include <stdio.h>
 
 //Kill
-#include <signal.h>
+# include <signal.h>
 //Wait
-#include <sys/types.h>
-#include <sys/wait.h>
+# include <sys/types.h>
+# include <sys/wait.h>
 //Sema
 # include <fcntl.h>           /* For O_* constants */
 # include <sys/stat.h>        /* For mode constants */
@@ -37,7 +37,7 @@
 # define SLEEPING "is sleeping"
 # define THINKING "is thinking"
 # define DIED "died"
-# define SEM_FORKS_AVAIABLES "/forks_avaiables"
+# define SEM_FORK_AVAIABLE "/forks_avaiables"
 # define SEM_PHILO_DEAD "/philo_dead"
 # define SEM_PHILO_DEAD_LOG "/philo_dead_log"
 # define SEM_PHILO_SATISFIED "/philo_satisfied"
@@ -46,7 +46,7 @@ typedef struct s_data
 {
 	sem_t			*forks;
 	sem_t			*philo_is_dead;
-	sem_t			*philo_is_dead_log;
+	sem_t			*philo_log;
 	sem_t			*philo_is_satisfied;
 	long int		time_to_die;
 	long int		time_to_eat;
@@ -61,6 +61,7 @@ typedef struct s_philo
 	int				id;
 	long int		last_meal;
 	sem_t			*last_meal_sem;
+	sem_t			*died_sem;
 	int				n_meals;
 	int				is_eating;
 	int				process_id;
@@ -93,5 +94,6 @@ void		set_time(long int *i);
 long int	get_miliseconds(struct timeval t);
 void		*unlock(pthread_mutex_t	*m);
 char		*ft_itoa(int n);
+int			ft_strncmp(const char *s1, const char *s2, size_t n);
 
 #endif
